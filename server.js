@@ -56,6 +56,33 @@ server.get('/api/projects/:id', (req,res) => {
 
 
 //POST request for project
+//test at postman at: http://localhost:9000/api/projects/
+// {
+// 	"name": "new project 1",
+// 	"description": "new project 1 description"
+// }
+
+server.post('/api/projects', (req,res) => {
+    const {name, description} = req.body;
+    if(!name || !description) {
+        res.status(400).json({message: 'Must provide a name and description'})
+        return;
+    }
+    projects
+        .insert({
+            name,
+            description
+        })
+        .then(response => {
+            res.status(201).json(response);
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(400).json({message: 'Error posting new project'});
+            return;
+        });
+});
+
 
 //DELETE request for project
 
@@ -63,6 +90,17 @@ server.get('/api/projects/:id', (req,res) => {
 
 
 //*************ACTIONs***************
+//http://localhost:9000/api/actions/
+
+//example of data structure
+// {
+//     "id": 1,
+//     "project_id": 1,
+//     "description": "Fork and Clone Repository",
+//     "notes": "Repo URL: https://github.com/LambdaSchool/Sprint-Challenge-Node-Express",
+//     "completed": false
+// },
+
 //GET request for all actions
 server.get('/api/actions', (req, res) => {
     actions.get()
@@ -93,7 +131,29 @@ server.get('/api/actions/:id', (req,res) => {
 });
 
 
-//POST request for action
+//POST request for action -- needs to specify a project id
+server.post('/api/actions', (req,res) => {
+    const {project_id, description, notes} = req.body;
+    if(!project_id || !description || !notes) {
+        res.status(400).json({message: 'Must provide a project id, description and notes'})
+        return;
+    }
+    actions
+        .insert({
+            project_id,
+            description,
+            notes
+        })
+        .then(response => {
+            res.status(201).json(response);
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(400).json({message: 'Error posting new action item'});
+            return;
+        });
+});
+
 
 //DELETE request for action
 
