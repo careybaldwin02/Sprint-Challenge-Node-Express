@@ -85,6 +85,23 @@ server.post('/api/projects', (req,res) => {
 
 
 //DELETE request for project
+server.delete('/api/projects/:id', (req, res) => {
+    const id = req.params.id;
+    projects
+        .remove(id)
+        .then(removeProject => {
+            if(removeProject === 0) {
+                res.status(404).json({message: 'No project corresponding to that identifier'});
+                return;
+            }else{
+            res.json({success: 'Project Successfully Removed'});
+        }
+    })
+    .catch(err => {
+        res.status(500).json({message: 'Error accessing project information'});
+        return;
+    });
+});
 
 //PUT request for project
 
@@ -156,5 +173,23 @@ server.post('/api/actions', (req,res) => {
 
 
 //DELETE request for action
+
+server.delete('/api/actions/:id', (req, res) => {
+    const id = req.params.id;
+    actions
+        .remove(id)
+        .then(removeAction => {
+            if(removeAction === 0) {
+                res.status(404).json({message: 'No action item corresponding to that identifier'});
+                return;
+            }else{
+            res.json({success: 'Action item Successfully Removed'});
+        }
+    })
+    .catch(err => {
+        res.status(500).json({message: 'Error accessing action item'});
+        return;
+    });
+});
 
 //PUT request for action
