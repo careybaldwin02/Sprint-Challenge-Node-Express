@@ -105,6 +105,42 @@ server.delete('/api/projects/:id', (req, res) => {
 
 //PUT request for project
 
+server.put('/api/projects/:id', (req,res) => {
+    const id = req.params.id;
+    const { name, description } = req.body;
+    if(!name || !description) {
+        res.status(400).json({message: 'Must provide a name and description'});
+        return;
+    }
+    projects
+        .update(id, {name, description})
+        .then(response => {
+            if (response == 0) {
+                res.status(404).json({message: 'There is no project with that identifier'});
+                return;
+            }else{
+                res.status(200).json({message: 'Project successfully updated'})
+            }
+        projects
+            .get(id)
+            .then(project => {
+                if (project.length === 0){
+                res.status(404).json({message: 'Unable to find specified project'});
+                return;
+            }
+            res.json(project);
+            })   
+        .catch(error => {
+            res.status(500).json({message: 'Error looking up project'});
+        }); 
+    })
+    .catch(error => {
+        res.status(500).json({message: 'Problem encountered in database'});
+        return;
+    });     
+});
+
+
 
 //*************ACTIONs***************
 //http://localhost:9000/api/actions/
@@ -193,3 +229,55 @@ server.delete('/api/actions/:id', (req, res) => {
 });
 
 //PUT request for action
+server.put('/api/actions/:id', (req,res) => {
+    const id = req.params.id;
+    const { description, notes } = req.body;
+    if(!description || !notes) {
+        res.status(400).json({message: 'Must provide a description and notes'});
+        return;
+    }
+    actions
+        .update(id, {description, notes})
+        .then(response => {
+            if (response == 0) {
+                res.status(404).json({message: 'There is no action item with that identifier'});
+                return;
+            }else{
+                res.status(200).json({message: 'Action item successfully updated'})
+            }
+        actions
+            .get(id)
+            .then(action => {
+                if (action.length === 0){
+                res.status(404).json({message: 'Unable to find specified action item'});
+                return;
+            }
+            res.json(action);
+            })   
+        .catch(error => {
+            res.status(500).json({message: 'Error looking up action item'});
+        }); 
+    })
+    .catch(error => {
+        res.status(500).json({message: 'Problem encountered in database'});
+        return;
+    });     
+});
+
+//GET a list of actions for a specified project ID
+server.get('/api/projects/actions/:project_id', (req,res)=> {
+    const project_id = req.params.project_id;
+    projects
+        .getProjectActions(project_id) //function defined in 'userDb.js'
+        .then(projectActions => {
+            if (projectActions===0){
+                res.status(404).json({message: 'Unable to find specified project'});
+                return;
+            }
+            res.json(projectActions);
+        })
+        .catch(error => {
+            res.status(500).json({message: 'problem encountered in database'});
+            return;
+    });
+});
